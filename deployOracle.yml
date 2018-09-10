@@ -1,0 +1,109 @@
+- hosts: localhost
+  vars:
+    - packages:
+      - vim
+      - tmux
+      - bind-utils
+      - net-tools
+      - xorg-x11-xauth
+      - xorg-x11-apps
+    - oracle_base: /u01/app/oracle
+    - oracle_inventory: /u01/app/oraInventory 
+    - oracle_home: /u01/app/oracle/product/12.1.2/
+
+  tasks:
+    - name: Disable SELinux
+      selinux:
+        state: disabled
+
+    - name: Install all updates
+      package:
+        name: '*'
+        state: latest
+
+    - name: Install epel repo
+      package:
+        name: epel-release
+        state: present
+
+    - name: Install packages
+      package:
+        name: "{{ item }}"
+        state: present
+      with_items: "{{ packages }}"
+
+    - name: Ensure that X11 forwarding is enabled
+      lineinfile: 
+        line: "{{ item }}"
+        path: /etc/ssh/sshd_config
+      with_items:
+        - 'X11Forwarding yes'
+        - 'X11DisplayOffset 10'
+      notify: Restart SSH
+
+    # - name: Check if Oracle is already installed
+
+    # - name: Install cvuqdisk
+
+    - name: Mount tmpfs with RW and Execute
+      mount:
+        path: /dev/shm
+        src: tmpfs
+        fstype: tmpfs
+        opts: rw,exec
+        state: present
+
+    - name: Transfer THP disable script
+      copy:
+        src: files/disable-thp.service
+        dest: /etc/systemd/system/disable-thp.service
+
+    - name: Start thp-disable
+      systemd:
+        daemon_reload: true
+        name: disable-thp
+        state: started
+        enabled: yes
+
+    - name: Create tuned THP disable directory
+      file:
+        path: /etc/tuned/no-thp
+        state: directory
+    
+    - name: Add tuned script
+      copy: 
+        src: files/tuned.conf
+        dest: /etc/tuned/no-thp/tuned.conf
+      notify: Update tuned profile
+
+    - name: Create Oracle group
+      group:
+        name: oinstall
+        state: present
+
+    - name: Create Oracle user
+      user:
+        name: oracle
+        group: oinstall
+        state: present
+
+    - name: Create Oracle directories
+      file:
+        path: "{{ item }}"
+        state: directory
+        recurse: yes
+        owner: oracle
+        group: oinstall
+      with_items:
+        - "{{ oracle_base }}"
+        - "{{ oracle_inventory }}"
+        - "{{ oracle_home }}"
+
+  handlers:
+    - name: Restart SSH
+      service:
+        name: sshd
+        state: restarted
+
+    - name: Update tuned profile
+      shell: tuned-adm profile no-thp
