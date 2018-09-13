@@ -7,6 +7,8 @@
       - net-tools
       - xorg-x11-xauth
       - xorg-x11-apps
+      - unzip
+      - smartmontools
     - oracle_base: /u01/app/oracle
     - oracle_inventory: /u01/app/oraInventory 
     - oracle_home: /u01/app/oracle/product/12.1.2/
@@ -43,7 +45,15 @@
 
     # - name: Check if Oracle is already installed
 
-    # - name: Install cvuqdisk
+    - name: Install cvuqdisk
+      yum:
+        name: ./files/database/rpm/cvuqdisk-1.0.10-1.rpm
+        state: present
+
+    - name: Set cvuqdisk environment variables
+      lineinfile:
+        line: 'CVUQDISK_GRP=oinstall'
+        path: /etc/environment
 
     - name: Mount tmpfs with RW and Execute
       mount:
@@ -98,6 +108,15 @@
         - "{{ oracle_base }}"
         - "{{ oracle_inventory }}"
         - "{{ oracle_home }}"
+
+    - name: Ensure that Oracle "mountpoints" exist
+      file:
+        path: "/{{ 'u%02x' | format(item) }}/oradata"
+        state: directory
+        recurse: yes
+        owner: oracle
+        group: oinstall
+      loop: "{{ range(1,7,1) | list }}"
 
   handlers:
     - name: Restart SSH
