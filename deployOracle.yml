@@ -7,8 +7,16 @@
       - net-tools
       - xorg-x11-xauth
       - xorg-x11-apps
+      - xorg-x11-utils
+      - xorg-x11-fonts-Type1
       - unzip
       - smartmontools
+      - compat-libcap1
+      - libstdc++-devel
+      - sysstat
+      - gcc-c++
+      - ksh
+      - libaio-devel
     - oracle_base: /u01/app/oracle
     - oracle_inventory: /u01/app/oraInventory 
     - oracle_home: /u01/app/oracle/product/12.1.2/
@@ -96,6 +104,18 @@
         name: oracle
         group: oinstall
         state: present
+
+    - name: Create Oracle Xauth file
+      file:
+        path: /home/oracle/.Xauthority
+        state: file
+        owner: oracle
+        group: oinstall
+
+    - name: Add required umask to Oracle profile
+      lineinfile:
+        path: /home/oracle/.bash_profile
+        line: umask 022
 
     - name: Create Oracle directories
       file:
