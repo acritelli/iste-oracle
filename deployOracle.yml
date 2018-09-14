@@ -51,6 +51,29 @@
         - 'X11DisplayOffset 10'
       notify: Restart SSH
 
+    - name: Create Oracle group
+      group:
+        name: oinstall
+        state: present
+
+    - name: Create Oracle user
+      user:
+        name: oracle
+        group: oinstall
+        state: present
+
+    - name: Create Oracle Xauth file
+      file:
+        path: /home/oracle/.Xauthority
+        state: touch
+        owner: oracle
+        group: oinstall
+
+    - name: Add oracle bash profile
+      copy:
+        src: oracle_bash_profile
+        dest: /home/oracle/.bash_profile
+
     # - name: Check if Oracle is already installed
 
     - name: Install cvuqdisk
@@ -102,29 +125,13 @@
         - oracle  hard  nofile  65536
         - oracle  hard  nproc  16384
         - oracle  hard  nproc  16384
+        - oracle  soft  stack  10240
+        - oracle  hard  stack  32768
 
-    - name: Create Oracle group
-      group:
-        name: oinstall
-        state: present
-
-    - name: Create Oracle user
-      user:
-        name: oracle
-        group: oinstall
-        state: present
-
-    - name: Create Oracle Xauth file
-      file:
-        path: /home/oracle/.Xauthority
-        state: touch
-        owner: oracle
-        group: oinstall
-
-    - name: Add required umask to Oracle profile
-      lineinfile:
-        path: /home/oracle/.bash_profile
-        line: umask 022
+    - name: Add Oracle kernel parameters
+      copy:
+        src: 97-oracle-database-sysctl.conf
+        dest: /etc/sysctl.d/97-oracle-database-sysctl.conf
 
     - name: Create Oracle directories
       file:
@@ -146,6 +153,22 @@
         owner: oracle
         group: oinstall
       loop: "{{ range(1,7,1) | list }}"
+
+    - name: Copy database response file to an accessible location
+      copy:
+        src: db.rsp
+        dest: /home/oracle/db.rsp
+
+    - name: Run the Oracle installer silently
+      shell: ./files/database/runInstaller -silent -waitForCompletion -noconfig -responseFile /home/oracle/db.rsp
+      become: yes
+      become_user: oracle
+
+    - name: Run post install scripts
+      shell: "{{ item }}"
+      with_items:
+        - /u01/app/oraInventory/orainstRoot.sh
+        - /u01/app/oracle/product/12.2.0/dbhome_1/root.sh
 
   handlers:
     - name: Restart SSH

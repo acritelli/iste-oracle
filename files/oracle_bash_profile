@@ -1,0 +1,27 @@
+# .bash_profile
+
+# Get the aliases and functions
+if [ -f ~/.bashrc ]; then
+	. ~/.bashrc
+fi
+
+# User specific environment and startup programs
+
+# Oracle required umask
+umask 022
+
+# Set x forwarding display
+DISPLAY=localhost:10.0
+
+# Set oracle specific variables
+ORACLE_HOME=/u01/app/oracle/product/12.2.0/dbhome_1
+ORACLE_BASE=/u01/app/oracle
+
+
+PATH=$PATH:$ORACLE_HOME/bin
+PATH=$PATH:$HOME/.local/bin:$HOME/bin
+
+export PATH
+export DISPLAY
+export ORACLE_HOME
+export ORACLE_BASE
