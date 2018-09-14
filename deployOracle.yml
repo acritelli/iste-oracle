@@ -94,6 +94,15 @@
         dest: /etc/tuned/no-thp/tuned.conf
       notify: Update tuned profile
 
+    - name: Increase limits to Oracle required values
+      lineinfile:
+        path: /etc/security/limits.conf
+        line: "{{ item }}"
+      with_items:
+        - oracle  hard  nofile  65536
+        - oracle  hard  nproc  16384
+        - oracle  hard  nproc  16384
+
     - name: Create Oracle group
       group:
         name: oinstall
@@ -108,7 +117,7 @@
     - name: Create Oracle Xauth file
       file:
         path: /home/oracle/.Xauthority
-        state: file
+        state: touch
         owner: oracle
         group: oinstall
 
