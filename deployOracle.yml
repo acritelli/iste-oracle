@@ -17,6 +17,7 @@
       - gcc-c++
       - ksh
       - libaio-devel
+      - libselinux-python
     - oracle_base: /u01/app/oracle
     - oracle_inventory: /u01/app/oraInventory 
     - oracle_home: /u01/app/oracle/product/12.1.2/
@@ -170,6 +171,11 @@
       with_items:
         - /u01/app/oraInventory/orainstRoot.sh
         - /u01/app/oracle/product/12.2.0/dbhome_1/root.sh
+
+    - name: Install different font package to resolve bug in RHEL/Java
+      package:
+        name: dejavu-serif-fonts
+        state: present
 
   handlers:
     - name: Restart SSH
