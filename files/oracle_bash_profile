@@ -14,14 +14,15 @@ umask 022
 DISPLAY=localhost:10.0
 
 # Set oracle specific variables
-ORACLE_HOME=/u01/app/oracle/product/12.2.0/dbhome_1
+ORACLE_HOME=/u01/app/oracle/product/12.2.0/db_1
 ORACLE_BASE=/u01/app/oracle
 
 
 PATH=$PATH:$ORACLE_HOME/bin
 PATH=$PATH:$HOME/.local/bin:$HOME/bin
 
-export PATH
-export DISPLAY
-export ORACLE_HOME
-export ORACLE_BASE
+EDITOR=vim
+export localIP=`/sbin/ifconfig | awk 'BEGIN { FS = "[ :]+" } /inet addr:10./ { print $4 }'`
+PS1="`whoami`@\$localIP:[\$PWD]`echo -e '\n$ '`"
+
+export PATH DISPLAY ORACLE_HOME ORACLE_BASE EDITOR
