@@ -18,6 +18,7 @@ The steps below are necessary to sufficiently bootstrap the AMI so that Ansible 
 4. Clone the repository. It's recommended that this be done in `/tmp` to avoid permissions issue with the Oracle installer, which must run as the `oracle` user. The rest of htese instructions assume that you are working from `/tmp`
   * `cd /tmp`
   * `git clone https://github.com/acritelli/iste-oracle.git`
+5. If the distribution being used doesn't have a swapfile, then create one using the instructions [here](https://aws.amazon.com/premiumsupport/knowledge-center/ec2-memory-swap-file/)
 
 ## Upload Oracle 12c
 
