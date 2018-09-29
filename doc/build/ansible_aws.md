@@ -4,18 +4,18 @@
 
 An Ansible automation script is provided in this repository to deploy Oracle Database 12c Release 2. The following documentation provides the steps necessary to run this script in AWS.
 
-This script has been tested locally on CentOS 7 and in AWS using the Amazon Linux version specified in [this documentation](./create_instance.md)
+This script has been tested locally on CentOS 7 and in AWS using the CentOS version specified in [this documentation](./create_instance.md)
 
 ## Pre-flight configuration
 
 The steps below are necessary to sufficiently bootstrap the AMI so that Ansible can run.
 
-1. Log in as the `ec2-user`
+1. Log in as the `centos`
 2. Install git: `sudo yum install -y git`
 3. Install Ansible. At time of writing, Ansible was only available in Amazon Linux via the Python package manager (pip): 
-  * `sudo yum install -y python-pip`
-  * `sudo pip install ansible`
-4. Clone the repository. It's recommended that this be done in `/tmp` to avoid permissions issue with the Oracle installer, which must run as the `oracle` user. The rest of htese instructions assume that you are working from `/tmp`
+  * `sudo yum install -y ansible`
+4. Install unzip: `sudo yum install -y unzip`
+5. Clone the repository. It's recommended that this be done in `/tmp` to avoid permissions issue with the Oracle installer, which must run as the `oracle` user. The rest of htese instructions assume that you are working from `/tmp`
   * `cd /tmp`
   * `git clone https://github.com/acritelli/iste-oracle.git`
 5. If the distribution being used doesn't have a swapfile, then create one using the instructions [here](https://aws.amazon.com/premiumsupport/knowledge-center/ec2-memory-swap-file/)
