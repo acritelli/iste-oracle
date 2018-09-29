@@ -134,6 +134,7 @@
       copy:
         src: 97-oracle-database-sysctl.conf
         dest: /etc/sysctl.d/97-oracle-database-sysctl.conf
+      notify: Refresh oracle kernel parameters
 
     - name: Create Oracle directories
       file:
@@ -185,3 +186,7 @@
 
     - name: Update tuned profile
       shell: tuned-adm profile no-thp
+
+    - name: Refresh oracle kernel parameters
+      shell: sysctl -p /etc/sysctl.d/97-oracle-database-sysctl.conf
+      become: yes
