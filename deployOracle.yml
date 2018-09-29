@@ -134,7 +134,10 @@
       copy:
         src: 97-oracle-database-sysctl.conf
         dest: /etc/sysctl.d/97-oracle-database-sysctl.conf
-      notify: Refresh oracle kernel parameters
+
+    - name: Refresh oracle kernel parameters
+      shell: sysctl -p /etc/sysctl.d/97-oracle-database-sysctl.conf
+      become: yes
 
     - name: Create Oracle directories
       file:
@@ -171,7 +174,7 @@
       shell: "{{ item }}"
       with_items:
         - /u01/app/oraInventory/orainstRoot.sh
-        - /u01/app/oracle/product/12.2.0/dbhome_1/root.sh
+        - /u01/app/oracle/product/12.2.0/db_1/root.sh
 
     - name: Install different font package to resolve bug in RHEL/Java
       package:
@@ -186,7 +189,3 @@
 
     - name: Update tuned profile
       shell: tuned-adm profile no-thp
-
-    - name: Refresh oracle kernel parameters
-      shell: sysctl -p /etc/sysctl.d/97-oracle-database-sysctl.conf
-      become: yes
