@@ -1,0 +1,38 @@
+#!/bin/bash
+# Have the user configure the virtual machine instance
+# by providing their e-mail address
+
+# Define the regex we will use to ensure a valid e-mail address
+# This regex checks that an e-mail is formed as either:
+#    student: abc1234@rit.edu
+#    professor: abcdef@rit.edu
+EMAIL_REGEX='^[a-zA-Z]{3}([0-9]{4}|[a-zA-Z]{3})@rit\.edu$'
+
+# Check if the email file already exists!
+if [ -f ~/.email ]; then
+	echo "Your instance has already been configured" >&2;
+	exit 0
+fi
+
+# Continually ask a user for the e-mail until they provide a valid one
+email_addr=""
+until [[ $email_addr =~ $EMAIL_REGEX ]]; do
+	read -r -p "Please provide your RIT e-mail address (ie - abc1234@rit.edu): " email_addr
+	if [[ ! $email_addr =~ $EMAIL_REGEX ]]; then
+		echo "Please provide a valid RIT e-mail address" >&2;
+	fi
+done
+
+# Obtain their DCE from the e-mail address
+rit_dce=${email_addr%%@rit.edu}
+
+# Place the initialization of the e-mail and DCE variables in the email file
+echo "export EMAIL='"$email_addr"'" > ~/.email
+echo "export DCE='"$rit_dce"'" >> ~/.email
+chmod 700 ~/.email
+
+# Set their DCE
+export DCE=$rit_dce
+
+# Run code in the ~/.email file
+. ~/.email

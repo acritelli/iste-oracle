@@ -1,0 +1,83 @@
+#!/bin/bash
+# restore script to restore the Oracle Database
+# and associated files in the Amazon EC2 Cloud Instance
+# Change to the /tmp/ directory, as to not make
+# the user's home directory dirty
+cd /tmp/
+
+# Say what we're going to attempt to do :)
+echo "This script will restore your previously backed-up files."
+
+
+else
+	# Grab a listing of files in user's backup directory
+	FILE_LIST=`ls -1 /backupOra/`
+	FILE_NUM=`ls -1 /backupOra | wc -l`
+	
+	# this is a flag to indicate if backups are coming from local or S3
+	# The flag is interpreted in the following way:
+	#  0 -- use files in /backupOra/
+	#  1 -- use files from S3
+	WHICHBACKUP=0
+	
+	# If we have <= 0 files (not sure why we'd have negative, but...)
+	if [ $FILE_NUM -le 0 ]; then
+		# if there's no files in the local backup directory, check if we're using
+		# AWS or cartman and pull the file list from the appropriate source.
+		FILE_LIST=`aws s3 ls "$DCE"oraclebackup`
+		FILE_NUM=`aws s3 ls "$DCE"oraclebackup | wc -l`
+		WHICHBACKUP=1
+	
+		if [ $FILE_NUM -le 0 ]; then
+			echo "Odd, it seems you don't have any backups!"
+			exit
+		fi
+	fi
+	
+	# Tell the user to select one of the printed out files
+	echo "Please provide the filename of one of the following backups.  If you don't see your backup, you may need to pull it from S3 (and ask your instructor for help)"
+	echo ""
+	echo $FILE_LIST | tr " " "\n"
+	echo ""
+	
+	# Set the current filename to nothing and loop until they have a proper file
+	restore_file=""
+	find_restore_file=""
+	while [ "$restore_file" = "" ]; do
+		echo -n "Which file should be restored: "
+		read restore_file
+	
+		# Fork here based on the WHICHBACKUP flag.  If backups are local, use 'ls', otherwise use 's3ls'
+		if [ $WHICHBACKUP -eq 0 ]; then
+			find_restore_file=`ls -1 /backupOra/"$restore_file" 2>/dev/null`
+		else 
+			find_restore_file=`aws s3 ls "$DCE"oraclebackup/"$restore_file" 2>/dev/null`
+		fi
+	
+		# The filename given is definitely not there..
+		if [ "$find_restore_file" = "" ]; then
+			echo "That file doesn't exist"
+			restore_file=""
+		fi
+	done
+	
+	# Let the user know what is going on
+	echo "This script will now make a temporary copy of your backup."
+	if [ $WHICHBACKUP -eq 0 ]; then
+		cp /backupOra/$restore_file /tmp/backup.tar.gz
+	else
+		aws s3 cp s3://"$DCE"oraclebackup/$find_restore_file /tmp/backup.tar.gz
+	fi
+fi
+
+echo "This script will now extract your files to the appropriate location."
+pv /tmp/backup.tar.gz | tar -Ppszx --exclude='/home/oracle/.Xauthority'
+
+# Change the permissions of the newly extracted files so the user has ownership of them
+chown -R oracle:oinstall /u0{1..8}/
+
+# Delete the files, since we should no longer need them
+rm /tmp/backup.tar.gz
+
+echo "Your backup has been restored"
+

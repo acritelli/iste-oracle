@@ -20,7 +20,7 @@ yum install -y epel-release
 
 4. Install all necessary packages. These include dependencies for Oracle database and tools that are useful for the end user, such as tmux and vim: 
 ```
-yum install -y vim tmux bind-utils net-tools xorg-x11-xauth xorg-x11-apps xorg-x11-utils xorg-x11-fonts-Type1 unzip smartmontools compat-libcap1 libstdc++-devel sysstat gcc-c++ ksh libaio-devel libselinux-python
+yum install -y vim tmux bind-utils net-tools xorg-x11-xauth xorg-x11-apps xorg-x11-utils xorg-x11-fonts-Type1 unzip smartmontools compat-libcap1 libstdc++-devel sysstat gcc-c++ ksh libaio-devel libselinux-python pv rlwrap
 ```
 
 5. Oracle requires a swap space to be created. Check to see if a swap space exists with the `swapon` command. If no swapfile exists, then create one:
@@ -122,13 +122,14 @@ chown -R oracle:oinstall /u01
 
 24. Make the "mountpoint" directories:
 ```
-mkdir -p /u01/oradata
-mkdir -p /u02/oradata
-mkdir -p /u03/oradata
-mkdir -p /u04/oradata
-mkdir -p /u05/oradata
-mkdir -p /u06/oradata
-
+mkdir -p /u01/app/oracle/oradata/jobs
+mkdir -p /u02/app/oracle/oradata/jobs
+mkdir -p /u03/app/oracle/oradata/jobs
+mkdir -p /u04/app/oracle/oradata/jobs
+mkdir -p /u05/app/oracle/oradata/jobs
+mkdir -p /u06/app/oracle/oradata/jobs
+mkdir -p /u07/app/oracle/oradata/jobs
+mkdir -p /u08/app/oracle/oradata/jobs
 chown -R oracle:oinstall /u0*
 ```
 

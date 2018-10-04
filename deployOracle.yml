@@ -18,6 +18,8 @@
       - ksh
       - libaio-devel
       - libselinux-python
+      - pv
+      - rlwrap
     - oracle_base: /u01/app/oracle
     - oracle_inventory: /u01/app/oraInventory 
     - oracle_home: /u01/app/oracle/product/12.1.2/
@@ -36,7 +38,7 @@
       package:
         name: epel-release
         state: present
-      when: ansible_distribution == 'RedHat'
+      when: ansible_distribution == 'CentOS'
 
     - name: Install packages
       package:
@@ -71,10 +73,13 @@
         owner: oracle
         group: oinstall
 
-    - name: Add oracle bash profile
+    - name: Add oracle home directory hidden files
       copy:
-        src: oracle_bash_profile
-        dest: /home/oracle/.bash_profile
+        src: "{{ item }}"
+        dest: /home/oracle/
+        owner: oracle
+        group: oinstall
+      with_fileglob: home/.*
 
     # - name: Check if Oracle is already installed
 
@@ -153,12 +158,12 @@
 
     - name: Ensure that Oracle "mountpoints" exist
       file:
-        path: "/{{ 'u%02x' | format(item) }}/oradata"
+        path: "/{{ 'u%02x' | format(item) }}/app/oracle/oradata/jobs"
         state: directory
         recurse: yes
         owner: oracle
         group: oinstall
-      with_list: "{{ range(1,7,1) | list }}"
+      with_list: "{{ range(1,9,1) | list }}"
 
     - name: Copy database response file to an accessible location
       copy:

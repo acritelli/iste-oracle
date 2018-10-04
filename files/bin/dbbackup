@@ -1,0 +1,72 @@
+#!/bin/bash
+# backup script to backup the Oracle Database
+# and associated files in the Amazon EC2 Cloud Instance
+
+# Notify the user about what will be performed
+echo -e "This script will backup directories and files that are commonly changed during
+the administration of an Oracle database.  These directories include:
+	-/u01/app/oracle/product/12.2.0/db_1/dbs/
+	-/u01/app/oracle/admin/jobs/
+	-/u01/app/oracle/diag/rdbms/jobs/
+	-/u01/app/oracle/flash_recovery_area/jobs/
+	-/u01 through /u08
+	-/home/oracle
+This script will delete any previous temporary backups found in /tmp on this machine."
+
+# Check if a backup already exists in the /tmp folder.
+# If so, prompt the user if they want to delete it or not and do so
+if [ -f /tmp/backup.tar.gz ]; then
+	echo "A temporary backup file already exists on this machine. If you continue, you will overwrite that file."
+	rm -i /tmp/backup.tar.gz
+fi
+
+# Notify the user as to what format of filename we are expecting/wanting
+echo "
+Please enter a filename for the backup. It should be of the form
+backup*.tar.gz where * represents any number of alpha-numeric characters
+(A-Z, a-z, 0-9). Press enter to take the default name shown in []"
+
+# Define the default filename, just in case if they don't specify one
+DEF_FILENAME=`date +backup%m%d%y.tar.gz`
+
+# Define a regular expression to match a "good" backup filename (which
+# is either blank, or a file ending in .tar.gz)
+FREGEX='^(|.+\.tar.gz)$'
+
+# Define a "bad" filename so the following loop will go through
+filename="-1"
+
+# Loop until a given backup filename is either blank (which means use 
+# the default filename given) or is a filename that ends in .tar.gz
+until [[ $filename =~ $FREGEX ]]; do
+        read -r -p "Filename ["$DEF_FILENAME"]: " filename
+        if [[ ! $filename =~ $FREGEX ]]; then
+                echo "Filename needs to end in .tar.gz" >&2;
+        fi
+done
+
+# If no filename was given, use the default
+if [ "$filename" = "" ]; then
+        filename=$DEF_FILENAME;
+fi
+
+# Create a compressed tar file containing the directories: /u01-/u08 and /home/oracle
+# (excluding oracle binaries)
+echo "Please wait while the system collects and compresses your files....."
+tar -Pscz --exclude='/home/oracle/.Xauthority' /u01/app/oracle/product/12.2.0/db_1/dbs/ /u01/app/oracle/admin/jobs/ /u01/app/oracle/diag/rdbms/jobs/ /u01/app/oracle/flash_recovery_area/jobs/ /u0{1..8}/app/oracle/oradata/jobs/ /home/oracle/ | pv > /tmp/backup.tar.gz
+
+# Copy the backup to the backup directory
+echo "Copying $filename to /backupOra/$filename"
+cp /tmp/backup.tar.gz /backupOra/$filename
+
+# Copy the backup to the Amazon S3 storage
+# and use the user-specified filename
+s3backupdir="$DCE"oraclebackup
+echo "Uploading $filename to $s3backupdir/$filename on your Amazon S3"
+aws s3 cp /tmp/backup.tar.gz s3://"$DCE"oraclebackup/$filename
+
+
+# Notify the user that the backup is complete
+echo "
+
+Your backup is complete."

@@ -1,0 +1,4 @@
+cp /u03/labfiles/jobs_known_good.tar.gz .
+/usr/local/bin/bar -if jobs_known_good.tar.gz | tar -Ppszx
+rm ./jobs_known_good.tar.gz
+chown -R oracle:oinstall /u0{1..8}/
