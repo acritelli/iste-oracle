@@ -20,6 +20,7 @@
       - libselinux-python
       - pv
       - rlwrap
+      - awscli
     - oracle_base: /u01/app/oracle
     - oracle_inventory: /u01/app/oraInventory 
     - oracle_home: /u01/app/oracle/product/12.1.2/
