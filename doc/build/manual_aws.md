@@ -25,7 +25,7 @@ yum install -y vim tmux bind-utils net-tools xorg-x11-xauth xorg-x11-apps xorg-x
 
 5. Oracle requires a swap space to be created. Check to see if a swap space exists with the `swapon` command. If no swapfile exists, then create one:
 ```
-dd -f=/dev/zero of=/swapfile bs=1G count=4
+dd if=/dev/zero of=/swapfile bs=1G count=4
 chmod 600 /swapfile
 mkswap /swapfile
 swapon /swapfile

@@ -85,7 +85,7 @@
 
     - name: Install cvuqdisk
       yum:
-        name: ./files/database/rpm/cvuqdisk-1.0.10-1.rpm
+        name: "{{ playbook_dir }}/files/database/rpm/cvuqdisk-1.0.10-1.rpm"
         state: present
 
     - name: Set cvuqdisk environment variables
