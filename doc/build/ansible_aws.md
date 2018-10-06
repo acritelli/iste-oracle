@@ -34,6 +34,10 @@ The Oracle 12c installer must be downloaded and placed into the appropriate dire
 
 The ansible script can now be run: `sudo ansible-playbook deployOracle.yml`
 
+# Add additional files
+
+Add any additional files necessary for the labs, including the known good copy of the database, scripts in `/u03/labfiles`, and any necessary scripts in `/home/oracle`. For the sake of flexibility, and because some files are very large, these are not included in this repository.
+
 # Cleanup
 
 1. Delete the ansible directory: `rm -rf /tmp/iste-oracle`

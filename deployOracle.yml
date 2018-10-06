@@ -40,6 +40,13 @@
         state: present
       when: ansible_distribution == 'CentOS'
 
+    - name: Enable RHEL extras when using RHEL
+      yum_repository:
+        name: rhui-REGION-rhel-server-extras
+        state: present
+        enabled: yes
+      when: ansible_distribution == 'RedHat'
+
     - name: Install packages
       package:
         name: "{{ item }}"
