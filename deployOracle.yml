@@ -20,6 +20,7 @@
       - libselinux-python
       - pv
       - rlwrap
+      - awscli
     - oracle_base: /u01/app/oracle
     - oracle_inventory: /u01/app/oraInventory 
     - oracle_home: /u01/app/oracle/product/12.1.2/
@@ -39,13 +40,6 @@
         name: epel-release
         state: present
       when: ansible_distribution == 'CentOS'
-
-    - name: Enable RHEL extras when using RHEL
-      yum_repository:
-        name: rhui-REGION-rhel-server-extras
-        state: present
-        enabled: yes
-      when: ansible_distribution == 'RedHat'
 
     - name: Install packages
       package:
