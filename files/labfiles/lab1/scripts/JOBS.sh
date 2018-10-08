@@ -21,4 +21,4 @@ PERL5LIB=$ORACLE_HOME/rdbms/admin:$PERL5LIB; export PERL5LIB
 ORACLE_SID=JOBS; export ORACLE_SID
 PATH=$ORACLE_HOME/bin:$ORACLE_HOME/perl/bin:$PATH; export PATH
 echo You should Add this entry in the /etc/oratab: JOBS:/u01/app/oracle/product/12.2.0/db_1:Y
-/u01/app/oracle/product/12.2.0/db_1/bin/sqlplus /nolog @/home/oracle/scripts/JOBS.sql
+/u01/app/oracle/product/12.2.0/db_1/bin/sqlplus /nolog @/u03/labfiles/lab1/scripts/JOBS.sql

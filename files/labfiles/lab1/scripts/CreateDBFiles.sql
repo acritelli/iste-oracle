@@ -1,7 +1,7 @@
 SET VERIFY OFF
 connect "SYS"/"&&sysPassword" as SYSDBA
 set echo on
-spool /home/oracle/scripts/CreateDBFiles.log append
+spool /u03/labfiles/lab1/scripts/CreateDBFiles.log append
 CREATE SMALLFILE TABLESPACE "USERS" LOGGING  DATAFILE  '/u06/app/oracle/oradata/jobs/users01.dbf' SIZE 5M REUSE AUTOEXTEND ON NEXT  1280K MAXSIZE UNLIMITED  EXTENT MANAGEMENT LOCAL  SEGMENT SPACE MANAGEMENT  AUTO;
 ALTER DATABASE DEFAULT TABLESPACE "USERS";
 spool off
