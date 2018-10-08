@@ -1,3 +1,4 @@
 deployOracle.retry
 files/oracleServer/
 files/database
+files/labfiles/jobs_known_good.tar.gz
