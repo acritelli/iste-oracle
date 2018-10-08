@@ -149,4 +149,10 @@ chown -R oracle:oinstall /u0*
 yum install -y dejavu-serif-fonts
 ```
 
-28. Transfer all necessary scripts and files to `/home/oracle` and `/u03/labfiles` as appropriate.
+28. Ensure that the `/backupOra` directory exists and is owned by `oracle:oinstall`
+```
+mkdir /backupOra
+chown oracle:oinstall /backupOra
+```
+
+29. Transfer all necessary scripts and files to `/home/oracle` and `/u03/labfiles` as appropriate.
